@@ -15,5 +15,5 @@ FROM orders o
 LEFT JOIN points p1 ON p1.id = o.source_point_id
 LEFT JOIN points p2 ON p2.id = o.delivery_point_id
 LEFT JOIN points p3 ON p3.id = o.return_point_id
-WHERE customer_id = $1::integer AND status = ANY($2::varchar[])
+WHERE sender_id = $1::integer AND status = ANY($2::varchar[])
 GROUP BY o.status

@@ -4,7 +4,7 @@
 
 SELECT
     o.id,
-    o.customer_id,
+    o.sender_id,
     o.source_point_id,
     p1.address AS source_address,
     p2.address AS delivery_address,
@@ -17,7 +17,7 @@ FROM orders o
 LEFT JOIN points p1 ON p1.id = o.source_point_id
 LEFT JOIN points p2 ON p2.id = o.delivery_point_id
 LEFT JOIN points p3 ON p3.id = o.return_point_id
-LEFT JOIN customers c ON c.id = o.customer_id
+LEFT JOIN senders c ON c.id = o.sender_id
 LEFT JOIN personal_data d ON d.id = c.personal_data_id
 RIGHT JOIN waybills w ON w.id = o.waybill_id
 WHERE w.id = $1::integer;

@@ -2,4 +2,4 @@
 --
 -- $1::integer              - Personal data id
 
-INSERT INTO customers (personal_data_id) VALUES ($1);
+INSERT INTO senders (personal_data_id) VALUES ($1);

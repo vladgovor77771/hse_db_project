@@ -7,9 +7,9 @@ CREATE TYPE "point_type" AS ENUM (
 CREATE TYPE "order_status" AS ENUM (
   'new',
   'accepted',
-  'driver_lookup',
-  'driver_found',
-  'driver_pickuped',
+  'courier_lookup',
+  'courier_found',
+  'courier_pickuped',
   'delivered',
   'finished',
   'cancelled',
@@ -23,7 +23,7 @@ CREATE TYPE "message_status" AS ENUM (
   'read'
 );
 
-CREATE TABLE "personal_datas" (
+CREATE TABLE "personal_data" (
   "id" serial PRIMARY KEY NOT NULL,
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
@@ -39,14 +39,14 @@ CREATE TABLE "cars" (
   "manufacture_year" integer NOT NULL
 );
 
-CREATE TABLE "drivers" (
+CREATE TABLE "couriers" (
   "id" serial PRIMARY KEY NOT NULL,
   "personal_data_id" integer NOT NULL,
-  "car_id" integer NOT NULL,
-  "driver_license_number" varchar NOT NULL
+  "car_id" integer,
+  "driver_license_number" varchar
 );
 
-CREATE TABLE "customers" (
+CREATE TABLE "senders" (
   "id" serial PRIMARY KEY NOT NULL,
   "personal_data_id" integer NOT NULL
 );
@@ -71,7 +71,7 @@ CREATE TABLE "points" (
 
 CREATE TABLE "waybills" (
   "id" serial PRIMARY KEY NOT NULL,
-  "driver_id" integer NOT NULL
+  "courier_id" integer NOT NULL
 );
 
 CREATE TABLE "waybill_points" (
@@ -86,10 +86,12 @@ CREATE TABLE "waybill_points" (
 
 CREATE TABLE "orders" (
   "id" serial PRIMARY KEY NOT NULL,
-  "customer_id" integer NOT NULL,
+  "sender_id" integer NOT NULL,
   "source_point_id" integer NOT NULL,
   "delivery_point_id" integer NOT NULL,
   "return_point_id" integer NOT NULL,
+  "recipient_name" varchar NOT NULL,
+  "recipient_phone" varchar NOT NULL,
   "waybill_id" integer,
   "status" order_status NOT NULL
 );
@@ -121,15 +123,15 @@ ALTER TABLE "waybill_points"
   ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id"),
   ADD FOREIGN KEY ("waybill_id") REFERENCES "waybills" ("id");
 
-ALTER TABLE "drivers" 
-  ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_datas" ("id"),
+ALTER TABLE "couriers" 
+  ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id"),
   ADD FOREIGN KEY ("car_id") REFERENCES "cars" ("id");
 
-ALTER TABLE "customers" 
-  ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_datas" ("id");
+ALTER TABLE "senders" 
+  ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
 
 ALTER TABLE "orders" 
-  ADD FOREIGN KEY ("customer_id") REFERENCES "customers" ("id"),
+  ADD FOREIGN KEY ("sender_id") REFERENCES "senders" ("id"),
   ADD FOREIGN KEY ("source_point_id") REFERENCES "points" ("id"),
   ADD FOREIGN KEY ("return_point_id") REFERENCES "points" ("id"),
   ADD FOREIGN KEY ("delivery_point_id") REFERENCES "points" ("id"),
@@ -140,14 +142,14 @@ ALTER TABLE "chats"
 
 ALTER TABLE "chat_messages" 
   ADD FOREIGN KEY ("chat_id") REFERENCES "chats" ("id"),
-  ADD FOREIGN KEY ("person_id") REFERENCES "personal_datas" ("id");
+  ADD FOREIGN KEY ("person_id") REFERENCES "personal_data" ("id");
 
 ALTER TABLE "order_items" 
   ADD FOREIGN KEY ("item_id") REFERENCES "items" ("id"),
   ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "waybills"
-  ADD FOREIGN KEY ("driver_id") REFERENCES "drivers" ("id");
+  ADD FOREIGN KEY ("courier_id") REFERENCES "couriers" ("id");
 
 CREATE TYPE customer_item AS (
   item_id integer,

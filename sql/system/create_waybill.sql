@@ -4,7 +4,7 @@
 -- $2::waybill_point[]      - Message ids
 
 WITH waybill AS (
-    INSERT INTO waybills (driver_id)
+    INSERT INTO waybills (courier_id)
     VALUES ($1)
     RETURNING id
 )

@@ -2,8 +2,8 @@ import {
   Car,
   Chat,
   ChatMessage,
-  Customer,
-  Driver,
+  Sender,
+  Courier,
   Item,
   Order,
   OrderItem,
@@ -26,7 +26,7 @@ export function insert<T>(
 
 export function insertPersonalDatas(datas: PersonalData[]) {
   return insert(
-    "personal_datas",
+    "personal_data",
     ["first_name", "last_name", "birthday", "phone_number"],
     datas,
     (d: PersonalData) =>
@@ -36,12 +36,12 @@ export function insertPersonalDatas(datas: PersonalData[]) {
   );
 }
 
-export function insertDrivers(datas: Driver[]) {
+export function insertCouriers(datas: Courier[]) {
   return insert(
-    "drivers",
+    "couriers",
     ["personal_data_id", "car_id", "driver_license_number"],
     datas,
-    (d: Driver) => `${d.personalDataId}, ${d.carId}, '${d.driverLicenseNumber}'`
+    (d: Courier) => `${d.personalDataId}, ${d.carId}, '${d.driverLicenseNumber}'`
   );
 }
 
@@ -54,12 +54,12 @@ export function insertCars(datas: Car[]) {
   );
 }
 
-export function insertCustomers(datas: Customer[]) {
+export function insertsenders(datas: Sender[]) {
   return insert(
-    "customers",
+    "senders",
     ["personal_data_id"],
     datas,
-    (d: Customer) => `${d.personalDataId}`
+    (d: Sender) => `${d.personalDataId}`
   );
 }
 
@@ -77,16 +77,18 @@ export function insertOrders(datas: Order[]) {
   return insert(
     "orders",
     [
-      "customer_id",
+      "sender_id",
       "source_point_id",
       "delivery_point_id",
       "return_point_id",
+      "recipient_name",
+      "recipient_phone",
       "waybill_id",
       "status",
     ],
     datas,
     (d: Order) =>
-      `${d.customerId}, ${d.sourcePointId}, ${d.deliveryPointId}, ${d.returnPointId}, ${
+      `${d.customerId}, ${d.sourcePointId}, ${d.deliveryPointId}, ${d.returnPointId}, '${d.recipientName}', '${d.recipientPhone}', ${
         d.waybillId ? d.waybillId : "NULL"
       }, '${d.status}'`
   );
@@ -111,7 +113,7 @@ export function insertOrderItems(datas: OrderItem[]) {
 }
 
 export function insertWaybills(datas: Waybill[]) {
-  return insert("waybills", ["driver_id"], datas, (d: Waybill) => `${d.driverId}`);
+  return insert("waybills", ["courier_id"], datas, (d: Waybill) => `${d.driverId}`);
 }
 
 export function insertWaybillPoints(datas: WaybillPoint[]) {

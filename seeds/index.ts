@@ -2,8 +2,8 @@ import {
   insertCars,
   insertChatMessages,
   insertChats,
-  insertCustomers,
-  insertDrivers,
+  insertsenders,
+  insertCouriers,
   insertItems,
   insertOrderItems,
   insertOrders,
@@ -36,27 +36,27 @@ const main = () => {
     drivers[i].carId = i + 1;
     drivers[i].personalDataId = i + 1;
   }
-  const customers = withIds(generateMany(generateCustomer, 10, 0));
+  const senders = withIds(generateMany(generateCustomer, 10, 0));
   for (let i = 0; i < 10; ++i) {
-    customers[i].personalDataId = i + 11;
+    senders[i].personalDataId = i + 11;
   }
   const items = withIds(generateMany(generateItem, 50));
   const points = withIds(generateMany(generatePoint, 50));
-  const orders = withIds(generateMany(generateOrder, 50, customers, points));
+  const orders = withIds(generateMany(generateOrder, 50, senders, points));
   const orderItems = generateOrderItems(orders, items);
   const { waybills, points: waybillPoints } = generateWaybillsWithPoints(orders, drivers);
   const { chats, messages } = generateChatsWithMessages(
     orders,
     waybills,
     drivers,
-    customers
+    senders
   );
   makeOrderStatuses(orders);
 
   console.log(insertPersonalDatas(personalDatas));
   console.log(insertCars(cars));
-  console.log(insertDrivers(drivers));
-  console.log(insertCustomers(customers));
+  console.log(insertCouriers(drivers));
+  console.log(insertsenders(senders));
   console.log(insertItems(items));
   console.log(insertPoints(points));
   console.log(insertWaybills(waybills));

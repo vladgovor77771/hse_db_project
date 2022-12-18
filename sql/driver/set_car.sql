@@ -12,6 +12,6 @@ WITH new_car AS (
     RETURNING id
 )
 
-UPDATE drivers
+UPDATE couriers
 SET car_id = (SELECT id FROM new_car)
 WHERE id = $1::integer;

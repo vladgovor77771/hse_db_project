@@ -8,7 +8,7 @@
 
 WITH order AS (
     INSERT INTO orders (
-        customer_id,
+        sender_id,
         source_point_id,
         delivery_point_id,
         return_point_id,

@@ -4,8 +4,8 @@ import * as lodash from "lodash";
 import {
   Car,
   ChatMessage,
-  Customer,
-  Driver,
+  Sender,
+  Courier,
   Item,
   PersonalData,
   Point,
@@ -40,13 +40,13 @@ export const generateCar = (): Car => ({
   manufactureYear: randomBetween(1995, 2022),
 });
 
-export const generateDriver = (personalDataId: number, carId?: number): Driver => ({
+export const generateDriver = (personalDataId: number, carId?: number): Courier => ({
   personalDataId,
   carId,
   driverLicenseNumber: faker.vehicle.vin(),
 });
 
-export const generateCustomer = (personalDataId: number): Customer => ({
+export const generateCustomer = (personalDataId: number): Sender => ({
   personalDataId,
 });
 
@@ -105,13 +105,15 @@ export function nRandomElementsFromArray<T>(arr: T[], amount: number) {
   return res;
 }
 
-export const generateOrder = (customers: Customer[], points: Point[]): Order => {
+export const generateOrder = (senders: Sender[], points: Point[]): Order => {
   const p = nRandomElementsFromArray(points, 3);
   return {
-    customerId: randomBetween(1, customers.length + 1),
+    customerId: randomBetween(1, senders.length + 1),
     sourcePointId: p[0].id!,
     deliveryPointId: p[1].id!,
     returnPointId: p[2].id!,
+    recipientName: faker.name.fullName().replace(/'/g, "‘"),
+    recipientPhone: faker.phone.number().replace(/'/g, "‘"),
     status: "new",
   };
 };
@@ -132,7 +134,7 @@ export const generateOrderItems = (orders: Order[], items: Item[]): OrderItem[] 
   return res;
 };
 
-export const generateWaybillsWithPoints = (orders: Order[], drivers: Driver[]) => {
+export const generateWaybillsWithPoints = (orders: Order[], drivers: Courier[]) => {
   const ordersToPack = orders.slice(
     0,
     randomBetween(Math.round(orders.length / 2), orders.length)
@@ -191,7 +193,7 @@ export const makeOrderStatuses = (orders: Order[]) => {
   for (let order of orders) {
     if (order.waybillId) {
       ordersByWaybills[order.waybillId!].push(order);
-      order.status = "driver_found";
+      order.status = "courier_found";
       continue;
     }
     const choose = Math.random();
@@ -200,7 +202,7 @@ export const makeOrderStatuses = (orders: Order[]) => {
     } else if (choose < 0.4) {
       order.status = "cancelled";
     } else if (choose < 0.6) {
-      order.status = "driver_lookup";
+      order.status = "courier_lookup";
     } else if (choose < 0.8) {
       order.status = "failed";
     }
@@ -212,7 +214,7 @@ export const makeOrderStatuses = (orders: Order[]) => {
     if (choose < 0.5) {
       targetStatus = "finished";
     } else if (choose < 0.75) {
-      targetStatus = "driver_found";
+      targetStatus = "courier_found";
     } else if (choose < 0.9) {
       targetStatus = "returned";
     } else {
@@ -228,12 +230,12 @@ export const makeOrderStatuses = (orders: Order[]) => {
 export const generateChatsWithMessages = (
   orders: Order[],
   waybills: Waybill[],
-  drivers: Driver[],
-  customers: Customer[]
+  drivers: Courier[],
+  senders: Sender[]
 ) => {
   const waybillsById = Object.fromEntries(waybills.map(x => [x.id! + "", x]));
   const driversById = Object.fromEntries(drivers.map(x => [x.id! + "", x]));
-  const customersById = Object.fromEntries(customers.map(x => [x.id! + "", x]));
+  const sendersById = Object.fromEntries(senders.map(x => [x.id! + "", x]));
   const ordersWithPerformer = orders.filter(x => !!x.waybillId);
   const chats: Chat[] = [];
   const messages: ChatMessage[] = [];
@@ -247,7 +249,7 @@ export const generateChatsWithMessages = (
     };
     const waybill = waybillsById[order.waybillId! + ""];
     const driver = driversById[waybill.driverId + ""];
-    const customer = customersById[order.customerId + ""];
+    const customer = sendersById[order.customerId + ""];
     const localMessagesAmount = randomBetween(0, 10);
     const localMessages = generateMany(generateChatMessage, localMessagesAmount, 0, 0);
     for (let msg of localMessages) {

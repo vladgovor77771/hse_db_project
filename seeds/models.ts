@@ -6,7 +6,7 @@ export interface PersonalData {
   phoneNumber: string;
 }
 
-export interface Driver {
+export interface Courier {
   id?: number;
   personalDataId: number;
   carId?: number;
@@ -21,7 +21,7 @@ export interface Car {
   manufactureYear: number;
 }
 
-export interface Customer {
+export interface Sender {
   id?: number;
   personalDataId: number;
 }
@@ -52,9 +52,9 @@ export interface Waybill {
 export type OrderStatus =
   | "new"
   | "accepted"
-  | "driver_lookup"
-  | "driver_found"
-  | "driver_pickuped"
+  | "courier_lookup"
+  | "courier_found"
+  | "courier_pickuped"
   | "delivered"
   | "finished"
   | "cancelled"
@@ -67,6 +67,8 @@ export interface Order {
   sourcePointId: number;
   deliveryPointId: number;
   returnPointId: number;
+  recipientName: string;
+  recipientPhone: string;
   waybillId?: number;
   status: OrderStatus;
 }
