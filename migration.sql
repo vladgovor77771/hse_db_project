@@ -104,7 +104,7 @@ CREATE TABLE "orders" (
   "return_point_id" integer NOT NULL,
   "recipient_name" varchar NOT NULL,
   "recipient_phone" varchar NOT NULL,
-  "price" decimal(10,2) NOT NULL,
+  "price" decimal(10,2) NOT NULL DEFAULT 0.0,
   "waybill_id" integer,
   "status" order_status NOT NULL
 );
