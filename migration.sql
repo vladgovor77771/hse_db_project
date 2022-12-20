@@ -23,12 +23,24 @@ CREATE TYPE "message_status" AS ENUM (
   'read'
 );
 
+CREATE TABLE "system_money" (
+  "id" serial PRIMARY KEY NOT NULL,
+  "balance" decimal(10,2) NOT NULL DEFAULT 0.0,
+  "fee" float NOT NULL DEFAULT 0.05
+);
+
 CREATE TABLE "personal_data" (
   "id" serial PRIMARY KEY NOT NULL,
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
   "birthday" date,
   "phone_number" varchar NOT NULL
+);
+
+CREATE TABLE "wallets" (
+  "id" serial PRIMARY KEY NOT NULL,
+  "person_id" integer NOT NULL,
+  "balance" decimal(10,2) NOT NULL DEFAULT 0.0
 );
 
 CREATE TABLE "cars" (
@@ -92,6 +104,7 @@ CREATE TABLE "orders" (
   "return_point_id" integer NOT NULL,
   "recipient_name" varchar NOT NULL,
   "recipient_phone" varchar NOT NULL,
+  "price" decimal(10,2) NOT NULL,
   "waybill_id" integer,
   "status" order_status NOT NULL
 );
@@ -117,6 +130,8 @@ CREATE TABLE "chat_messages" (
   "created_at" timestamptz NOT NULL,
   "status" message_status NOT NULL
 );
+
+ALTER TABLE "wallets" ADD FOREIGN KEY (person_id) REFERENCES "personal_datas" ("id");
 
 ALTER TABLE "waybill_points" 
   ADD FOREIGN KEY ("point_id") REFERENCES "points" ("id"),
