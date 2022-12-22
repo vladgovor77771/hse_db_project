@@ -32,7 +32,7 @@ CREATE TABLE "system_money" (
 CREATE TABLE "personal_data" (
   "id" serial PRIMARY KEY NOT NULL,
   "first_name" varchar NOT NULL,
-  "last_name" varchar NOT NULL,
+  "last_name" varchar,
   "birthday" date,
   "phone_number" varchar NOT NULL
 );
@@ -131,7 +131,7 @@ CREATE TABLE "chat_messages" (
   "status" message_status NOT NULL
 );
 
-ALTER TABLE "wallets" ADD FOREIGN KEY (person_id) REFERENCES "personal_datas" ("id");
+ALTER TABLE "wallets" ADD FOREIGN KEY (person_id) REFERENCES "personal_data" ("id");
 
 ALTER TABLE "waybill_points" 
   ADD FOREIGN KEY ("point_id") REFERENCES "points" ("id"),

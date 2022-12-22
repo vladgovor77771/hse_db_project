@@ -46,6 +46,6 @@ DO $$
     THEN
         ROLLBACK;
     END
-$$
+$$;
 
 COMMIT;
