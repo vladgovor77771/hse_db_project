@@ -121,12 +121,12 @@ CREATE TABLE "chats" (
 );
 
 CREATE TABLE "chat_messages" (
-  "id" serial PRIMARY KEY NOT NULL,
   "chat_id" integer NOT NULL,
   "person_id" integer NOT NULL,
   "message" varchar NOT NULL,
   "created_at" timestamptz NOT NULL,
-  "status" message_status NOT NULL
+  "status" message_status NOT NULL,
+  PRIMARY KEY ("chat_id", "person_id", "created_at")
 );
 
 ALTER TABLE "points" ADD FOREIGN KEY (coordinates_id) REFERENCES "points_coordinates" ("id");
