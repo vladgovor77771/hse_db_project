@@ -24,7 +24,6 @@ CREATE TYPE "message_status" AS ENUM (
 );
 
 CREATE TABLE "system_money" (
-  "id" serial PRIMARY KEY NOT NULL,
   "balance" decimal(10,2) NOT NULL DEFAULT 0.0,
   "fee" float NOT NULL DEFAULT 0.05
 );
@@ -38,29 +37,25 @@ CREATE TABLE "personal_data" (
 );
 
 CREATE TABLE "wallets" (
-  "id" serial PRIMARY KEY NOT NULL,
-  "person_id" integer NOT NULL,
+  "person_data_id" integer PRIMARY KEY NOT NULL,
   "balance" decimal(10,2) NOT NULL DEFAULT 0.0
 );
 
 CREATE TABLE "cars" (
-  "id" serial PRIMARY KEY NOT NULL,
-  "number" varchar NOT NULL,
+  "number" varchar PRIMARY KEY NOT NULL,
   "brand" varchar NOT NULL,
   "model" varchar NOT NULL,
   "manufacture_year" integer NOT NULL
 );
 
 CREATE TABLE "couriers" (
-  "id" serial PRIMARY KEY NOT NULL,
-  "personal_data_id" integer NOT NULL,
+  "personal_data_id" integer PRIMARY KEY NOT NULL,
   "car_id" integer,
   "driver_license_number" varchar
 );
 
 CREATE TABLE "senders" (
-  "id" serial PRIMARY KEY NOT NULL,
-  "personal_data_id" integer NOT NULL
+  "personal_data_id" integer PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE "items" (
@@ -76,9 +71,14 @@ CREATE TABLE "items" (
 
 CREATE TABLE "points" (
   "id" serial PRIMARY KEY NOT NULL,
+  "address" varchar NOT NULL,
+  "coordinates_id" integer
+);
+
+CREATE TABLE "points_coordinates" (
+  "id" serial PRIMARY KEY NOT NULL,
   "longitude" double precision NOT NULL,
   "latitude" double precision NOT NULL,
-  "address" varchar NOT NULL
 );
 
 CREATE TABLE "waybills" (
@@ -89,11 +89,10 @@ CREATE TABLE "waybills" (
 CREATE TABLE "waybill_points" (
   "point_id" integer NOT NULL,
   "order_id" integer NOT NULL,
-  "waybill_id" integer NOT NULL,
   "type" point_type NOT NULL,
   "visit_order" integer NOT NULL,
   "visited" boolean NOT NULL DEFAULT FALSE,
-  PRIMARY KEY ("order_id", "waybill_id", "type")
+  PRIMARY KEY ("order_id", "type")
 );
 
 CREATE TABLE "orders" (
@@ -117,30 +116,30 @@ CREATE TABLE "order_items" (
 );
 
 CREATE TABLE "chats" (
-  "id" serial PRIMARY KEY NOT NULL,
-  "order_id" integer NOT NULL,
+  "order_id" integer PRIMARY KEY NOT NULL,
   "updated_at" timestamptz NOT NULL
 );
 
 CREATE TABLE "chat_messages" (
-  "id" serial PRIMARY KEY NOT NULL,
   "chat_id" integer NOT NULL,
   "person_id" integer NOT NULL,
   "message" varchar NOT NULL,
   "created_at" timestamptz NOT NULL,
   "status" message_status NOT NULL
+  PRIMARY KEY ("person_id", "chat_id", "created_at")
 );
 
-ALTER TABLE "wallets" ADD FOREIGN KEY (person_id) REFERENCES "personal_data" ("id");
+ALTER TABLE "points" ADD FOREIGN KEY (coordinates_id) REFERENCES "points_coordinates" ("id");
+
+ALTER TABLE "wallets" ADD FOREIGN KEY (person_data_id) REFERENCES "personal_data" ("id");
 
 ALTER TABLE "waybill_points" 
   ADD FOREIGN KEY ("point_id") REFERENCES "points" ("id"),
-  ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id"),
-  ADD FOREIGN KEY ("waybill_id") REFERENCES "waybills" ("id");
+  ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "couriers" 
   ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id"),
-  ADD FOREIGN KEY ("car_id") REFERENCES "cars" ("id");
+  ADD FOREIGN KEY ("car_id") REFERENCES "cars" ("number");
 
 ALTER TABLE "senders" 
   ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
@@ -156,7 +155,7 @@ ALTER TABLE "chats"
   ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "chat_messages" 
-  ADD FOREIGN KEY ("chat_id") REFERENCES "chats" ("id"),
+  ADD FOREIGN KEY ("chat_id") REFERENCES "chats" ("order_id"),
   ADD FOREIGN KEY ("person_id") REFERENCES "personal_data" ("id");
 
 ALTER TABLE "order_items" 
@@ -164,7 +163,7 @@ ALTER TABLE "order_items"
   ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "waybills"
-  ADD FOREIGN KEY ("courier_id") REFERENCES "couriers" ("id");
+  ADD FOREIGN KEY ("courier_id") REFERENCES "couriers" ("personal_data_id");
 
 CREATE TYPE customer_item AS (
   item_id integer,
@@ -181,7 +180,6 @@ CREATE TYPE customer_order AS (
 CREATE TYPE waybill_point AS (
   "point_id" integer,
   "order_id" integer,
-  "waybill_id" integer,
   "type" point_type,
   "visit_order" integer
 );
