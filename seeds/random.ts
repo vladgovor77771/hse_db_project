@@ -16,6 +16,7 @@ import {
   visitOrderToPointType,
   OrderStatus,
   Chat,
+  PointCoordinate,
 } from "./models";
 
 export const randomBetween = (from: number, to?: number) => {
@@ -40,9 +41,9 @@ export const generateCar = (): Car => ({
   manufactureYear: randomBetween(1995, 2022),
 });
 
-export const generateDriver = (personalDataId: number, carId?: number): Courier => ({
+export const generateDriver = (personalDataId: number, carNumber?: string): Courier => ({
   personalDataId,
-  carId,
+  carNumber,
   driverLicenseNumber: faker.vehicle.vin(),
 });
 
@@ -50,9 +51,13 @@ export const generateCustomer = (personalDataId: number): Sender => ({
   personalDataId,
 });
 
-export const generatePoint = (): Point => ({
+export const generatePointCoordinate = (): PointCoordinate => ({
   longitude: +faker.address.longitude(),
   latitude: +faker.address.latitude(),
+});
+
+export const generatePoint = (coordinates: PointCoordinate[]): Point => ({
+  coordinatesId: randomBetween(1, coordinates.length),
   address: faker.address.streetAddress().replace(/'/g, "‘"),
 });
 
@@ -70,7 +75,7 @@ export const generateChatMessage = (chatId: number, personId: number): ChatMessa
   chatId,
   personId,
   message: `${faker.word.noun()} ${faker.word.noun()}`.replace(/'/g, "‘"),
-  createdAt: new Date(),
+  createdAt: faker.date.past(),
   status: faker.helpers.arrayElement(["sent", "received", "read"]),
 });
 
@@ -108,7 +113,7 @@ export function nRandomElementsFromArray<T>(arr: T[], amount: number) {
 export const generateOrder = (senders: Sender[], points: Point[]): Order => {
   const p = nRandomElementsFromArray(points, 3);
   return {
-    customerId: randomBetween(1, senders.length + 1),
+    customerId: faker.helpers.arrayElement(senders).personalDataId,
     sourcePointId: p[0].id!,
     deliveryPointId: p[1].id!,
     returnPointId: p[2].id!,
@@ -152,7 +157,7 @@ export const generateWaybillsWithPoints = (orders: Order[], drivers: Courier[]) 
 
     let waybill: Waybill = {
       id: ids++,
-      driverId: driver.id!,
+      courierId: driver.personalDataId!,
     };
     let usedPoints: { [orderId: string]: number } = Object.fromEntries(
       ordersInWaybill.map(x => [x.id! + "", 0])
@@ -169,7 +174,6 @@ export const generateWaybillsWithPoints = (orders: Order[], drivers: Courier[]) 
         pointId:
           currentOrder[`${visitOrderToPointType(usedPoints[currentOrderId])}PointId`],
         orderId: +currentOrderId,
-        waybillId: waybill.id!,
         type: visitOrderToPointType(usedPoints[currentOrderId]),
         visitOrder: localPoints.length + 1,
         visited: false,
@@ -234,8 +238,8 @@ export const generateChatsWithMessages = (
   senders: Sender[]
 ) => {
   const waybillsById = Object.fromEntries(waybills.map(x => [x.id! + "", x]));
-  const driversById = Object.fromEntries(drivers.map(x => [x.id! + "", x]));
-  const sendersById = Object.fromEntries(senders.map(x => [x.id! + "", x]));
+  const driversById = Object.fromEntries(drivers.map(x => [x.personalDataId! + "", x]));
+  const sendersById = Object.fromEntries(senders.map(x => [x.personalDataId! + "", x]));
   const ordersWithPerformer = orders.filter(x => !!x.waybillId);
   const chats: Chat[] = [];
   const messages: ChatMessage[] = [];
@@ -248,7 +252,7 @@ export const generateChatsWithMessages = (
       updatedAt: new Date(),
     };
     const waybill = waybillsById[order.waybillId! + ""];
-    const driver = driversById[waybill.driverId + ""];
+    const driver = driversById[waybill.courierId + ""];
     const customer = sendersById[order.customerId + ""];
     const localMessagesAmount = randomBetween(0, 10);
     const localMessages = generateMany(generateChatMessage, localMessagesAmount, 0, 0);

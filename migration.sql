@@ -37,7 +37,7 @@ CREATE TABLE "personal_data" (
 );
 
 CREATE TABLE "wallets" (
-  "person_data_id" integer PRIMARY KEY NOT NULL,
+  "personal_data_id" integer PRIMARY KEY NOT NULL,
   "balance" decimal(10,2) NOT NULL DEFAULT 0.0
 );
 
@@ -50,7 +50,7 @@ CREATE TABLE "cars" (
 
 CREATE TABLE "couriers" (
   "personal_data_id" integer PRIMARY KEY NOT NULL,
-  "car_id" integer,
+  "car_number" varchar,
   "driver_license_number" varchar
 );
 
@@ -78,7 +78,7 @@ CREATE TABLE "points" (
 CREATE TABLE "points_coordinates" (
   "id" serial PRIMARY KEY NOT NULL,
   "longitude" double precision NOT NULL,
-  "latitude" double precision NOT NULL,
+  "latitude" double precision NOT NULL
 );
 
 CREATE TABLE "waybills" (
@@ -121,17 +121,17 @@ CREATE TABLE "chats" (
 );
 
 CREATE TABLE "chat_messages" (
+  "id" serial PRIMARY KEY NOT NULL,
   "chat_id" integer NOT NULL,
   "person_id" integer NOT NULL,
   "message" varchar NOT NULL,
   "created_at" timestamptz NOT NULL,
   "status" message_status NOT NULL
-  PRIMARY KEY ("person_id", "chat_id", "created_at")
 );
 
 ALTER TABLE "points" ADD FOREIGN KEY (coordinates_id) REFERENCES "points_coordinates" ("id");
 
-ALTER TABLE "wallets" ADD FOREIGN KEY (person_data_id) REFERENCES "personal_data" ("id");
+ALTER TABLE "wallets" ADD FOREIGN KEY (personal_data_id) REFERENCES "personal_data" ("id");
 
 ALTER TABLE "waybill_points" 
   ADD FOREIGN KEY ("point_id") REFERENCES "points" ("id"),
@@ -139,13 +139,13 @@ ALTER TABLE "waybill_points"
 
 ALTER TABLE "couriers" 
   ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id"),
-  ADD FOREIGN KEY ("car_id") REFERENCES "cars" ("number");
+  ADD FOREIGN KEY ("car_number") REFERENCES "cars" ("number");
 
 ALTER TABLE "senders" 
   ADD FOREIGN KEY ("personal_data_id") REFERENCES "personal_data" ("id");
 
 ALTER TABLE "orders" 
-  ADD FOREIGN KEY ("sender_id") REFERENCES "senders" ("id"),
+  ADD FOREIGN KEY ("sender_id") REFERENCES "senders" ("personal_data_id"),
   ADD FOREIGN KEY ("source_point_id") REFERENCES "points" ("id"),
   ADD FOREIGN KEY ("return_point_id") REFERENCES "points" ("id"),
   ADD FOREIGN KEY ("delivery_point_id") REFERENCES "points" ("id"),

@@ -11,6 +11,7 @@ import {
   Point,
   Waybill,
   WaybillPoint,
+  PointCoordinate,
 } from "./models";
 
 export function insert<T>(
@@ -39,9 +40,9 @@ export function insertPersonalDatas(datas: PersonalData[]) {
 export function insertCouriers(datas: Courier[]) {
   return insert(
     "couriers",
-    ["personal_data_id", "car_id", "driver_license_number"],
+    ["personal_data_id", "car_number", "driver_license_number"],
     datas,
-    (d: Courier) => `${d.personalDataId}, ${d.carId}, '${d.driverLicenseNumber}'`
+    (d: Courier) => `${d.personalDataId}, '${d.carNumber}', '${d.driverLicenseNumber}'`
   );
 }
 
@@ -54,7 +55,7 @@ export function insertCars(datas: Car[]) {
   );
 }
 
-export function insertsenders(datas: Sender[]) {
+export function insertSenders(datas: Sender[]) {
   return insert(
     "senders",
     ["personal_data_id"],
@@ -97,9 +98,18 @@ export function insertOrders(datas: Order[]) {
 export function insertPoints(datas: Point[]) {
   return insert(
     "points",
-    ["longitude", "latitude", "address"],
+    ["coordinates_id", "address"],
     datas,
-    (d: Point) => `${d.longitude}, ${d.latitude}, '${d.address}'`
+    (d: Point) => `${d.coordinatesId}, '${d.address}'`
+  );
+}
+
+export function insertPointsCoordinates(datas: PointCoordinate[]) {
+  return insert(
+    "points_coordinates",
+    ["latitude", "longitude"],
+    datas,
+    (d: PointCoordinate) => ` ${d.latitude}, ${d.longitude}`
   );
 }
 
@@ -113,16 +123,16 @@ export function insertOrderItems(datas: OrderItem[]) {
 }
 
 export function insertWaybills(datas: Waybill[]) {
-  return insert("waybills", ["courier_id"], datas, (d: Waybill) => `${d.driverId}`);
+  return insert("waybills", ["courier_id"], datas, (d: Waybill) => `${d.courierId}`);
 }
 
 export function insertWaybillPoints(datas: WaybillPoint[]) {
   return insert(
     "waybill_points",
-    ["point_id", "order_id", "waybill_id", "type", "visit_order", "visited"],
+    ["point_id", "order_id", "type", "visit_order", "visited"],
     datas,
     (d: WaybillPoint) =>
-      `${d.pointId}, ${d.orderId}, ${d.waybillId}, '${d.type}', ${d.visitOrder}, ${
+      `${d.pointId}, ${d.orderId}, '${d.type}', ${d.visitOrder}, ${
         d.visited ? "TRUE" : "FALSE"
       }`
   );
@@ -142,6 +152,6 @@ export function insertChatMessages(datas: ChatMessage[]) {
     "chat_messages",
     ["chat_id", "person_id", "message", "created_at", "status"],
     datas,
-    (d: ChatMessage) => `${d.chatId}, ${d.personId}, '${d.message}', NOW(), '${d.status}'`
+    (d: ChatMessage) => `${d.chatId}, ${d.personId}, '${d.message}', '${d.createdAt.toISOString()}', '${d.status}'`
   );
 }

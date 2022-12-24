@@ -2,4 +2,4 @@
 --
 -- $1::integer              - Person id
 
-SELECT * FROM wallets WHERE person_id = $1::integer;
+SELECT * FROM wallets WHERE personal_data_id = $1::integer;

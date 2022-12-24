@@ -10,5 +10,4 @@ SELECT
     cm.status,
     c.updated_at as chat_updated_at
 FROM chat_messages cm
-LEFT JOIN chats c ON c.id = cm.chat_id
-WHERE c.order_id = $1::integer;
+WHERE cm.chat_id = $1::integer;

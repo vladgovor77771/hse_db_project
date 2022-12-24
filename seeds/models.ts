@@ -7,14 +7,12 @@ export interface PersonalData {
 }
 
 export interface Courier {
-  id?: number;
   personalDataId: number;
-  carId?: number;
+  carNumber?: string;
   driverLicenseNumber: string;
 }
 
 export interface Car {
-  id?: number;
   carNumber: string;
   brand: string;
   model: string;
@@ -22,7 +20,6 @@ export interface Car {
 }
 
 export interface Sender {
-  id?: number;
   personalDataId: number;
 }
 
@@ -37,16 +34,20 @@ export interface Item {
   minAge: number;
 }
 
+export interface PointCoordinate {
+  latitude: number;
+  longitude: number;
+}
+
 export interface Point {
   id?: number;
-  longitude: number;
-  latitude: number;
   address: string;
+  coordinatesId: number;
 }
 
 export interface Waybill {
   id?: number;
-  driverId: number;
+  courierId: number;
 }
 
 export type OrderStatus =
@@ -84,7 +85,6 @@ export type PointType = "source" | "delivery" | "return";
 export interface WaybillPoint {
   pointId: number;
   orderId: number;
-  waybillId: number;
   type: PointType;
   visitOrder: number;
   visited: boolean;
@@ -98,7 +98,6 @@ export function visitOrderToPointType(order: number): PointType {
 }
 
 export interface Chat {
-  id?: number;
   orderId: number;
   updatedAt: Date;
 }
@@ -106,7 +105,6 @@ export interface Chat {
 export type MessageStatus = "sent" | "received" | "read";
 
 export interface ChatMessage {
-  id?: number;
   chatId: number;
   personId: number;
   message: string;

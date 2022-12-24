@@ -6,4 +6,4 @@
 UPDATE wallets
 SET
     balance = balance + $2::decimal(10, 2)
-WHERE person_id = $1::integer;
+WHERE personal_data_id = $1::integer;

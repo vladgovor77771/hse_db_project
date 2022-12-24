@@ -2,7 +2,7 @@ import {
   insertCars,
   insertChatMessages,
   insertChats,
-  insertsenders,
+  insertSenders,
   insertCouriers,
   insertItems,
   insertOrderItems,
@@ -11,6 +11,7 @@ import {
   insertPoints,
   insertWaybillPoints,
   insertWaybills,
+  insertPointsCoordinates,
 } from "./sql";
 import {
   generateCar,
@@ -23,6 +24,7 @@ import {
   generateOrderItems,
   generatePersonalData,
   generatePoint,
+  generatePointCoordinate,
   generateWaybillsWithPoints,
   makeOrderStatuses,
   withIds,
@@ -30,18 +32,19 @@ import {
 
 const main = () => {
   const personalDatas = withIds(generateMany(generatePersonalData, 20));
-  const cars = withIds(generateMany(generateCar, 10));
-  const drivers = withIds(generateMany(generateDriver, 10, 0, 0));
+  const cars = generateMany(generateCar, 10);
+  const drivers = generateMany(generateDriver, 10, 0, 0);
   for (let i = 0; i < 10; ++i) {
-    drivers[i].carId = i + 1;
+    drivers[i].carNumber = cars[i].carNumber;
     drivers[i].personalDataId = i + 1;
   }
-  const senders = withIds(generateMany(generateCustomer, 10, 0));
+  const senders = generateMany(generateCustomer, 10, 0);
   for (let i = 0; i < 10; ++i) {
     senders[i].personalDataId = i + 11;
   }
   const items = withIds(generateMany(generateItem, 50));
-  const points = withIds(generateMany(generatePoint, 50));
+  const coordinates = withIds(generateMany(generatePointCoordinate, 50));
+  const points = withIds(generateMany(generatePoint, 50, coordinates));
   const orders = withIds(generateMany(generateOrder, 50, senders, points));
   const orderItems = generateOrderItems(orders, items);
   const { waybills, points: waybillPoints } = generateWaybillsWithPoints(orders, drivers);
@@ -56,8 +59,9 @@ const main = () => {
   console.log(insertPersonalDatas(personalDatas));
   console.log(insertCars(cars));
   console.log(insertCouriers(drivers));
-  console.log(insertsenders(senders));
+  console.log(insertSenders(senders));
   console.log(insertItems(items));
+  console.log(insertPointsCoordinates(coordinates));
   console.log(insertPoints(points));
   console.log(insertWaybills(waybills));
   console.log(insertOrders(orders));

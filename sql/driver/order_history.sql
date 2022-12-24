@@ -1,6 +1,6 @@
 -- Args
 --
--- $1::integer              - Driver id
+-- $1::integer              - Driver id (=personal data id)
 
 SELECT
     o.id,
@@ -17,7 +17,6 @@ FROM orders o
 LEFT JOIN points p1 ON p1.id = o.source_point_id
 LEFT JOIN points p2 ON p2.id = o.delivery_point_id
 LEFT JOIN points p3 ON p3.id = o.return_point_id
-LEFT JOIN senders c ON c.id = o.sender_id
-LEFT JOIN personal_data d ON d.id = c.personal_data_id
+LEFT JOIN personal_data d ON d.id = o.sender_id
 RIGHT JOIN waybills w ON w.id = o.waybill_id
 WHERE w.courier_id = $1::integer;
